@@ -9,6 +9,7 @@ import plotly.express as px
 
 from dash.dependencies import Input, Output
 from datetime import date, timedelta, datetime
+from waitress import serve
 
 external_stylesheets = [
     {
@@ -189,4 +190,5 @@ def error_notice(country, status):
 
 
 if __name__ == "__main__":
-    app.run_server()
+    # app.run_server()
+    serve(app)
