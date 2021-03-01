@@ -1,1 +1,1 @@
-web: waitress-serve --port=$PORT covid_dash:application
+web: waitress-serve --port=$PORT covid_dash.wsgi:application
