@@ -1,6 +1,7 @@
 import requests
 import dash
 import dash_table
+import json
 import dash_core_components as dcc
 import dash_html_components as dh
 import pandas as pd
@@ -141,7 +142,7 @@ app.layout = dh.Div(
 
 
 @app.callback(
-    [Output("graph", "figure")],
+    Output("graph", "figure"),
     [Input("country", "value"),
     Input("status", "value")]
 )
@@ -150,11 +151,11 @@ def update_graph(country, status):
     params = {"from": str(start_date), "to": str(today)}
 
     response = requests.get(endpoint, params=params).json()
-    norm_data = pd.json_normalize(response)
-    if norm_data.empty:
-        return dash.no_update
-    else:
+    try:
+        norm_data = pd.json_normalize(response)
         norm_data = norm_data[norm_data["Province"] == ""]
+    except (json.JSONDecodeError, KeyError):
+        return dash.no_update
 
     fig = px.line(
         norm_data,
@@ -171,8 +172,8 @@ def update_graph(country, status):
 
 @app.callback(
     Output("confirm", "displayed"),
-    Input("country", "value"),
-    Input("status", "value")
+    [Input("country", "value"),
+    Input("status", "value")]
 )
 def error_notice(country, status):
     endpoint = f"https://api.covid19api.com/country/{country}/status/{status}"
@@ -180,8 +181,11 @@ def error_notice(country, status):
 
     response = requests.get(endpoint, params=params).json()
     norm_data = pd.json_normalize(response)
-    if norm_data.empty:
-        return True
+    try:
+        if norm_data.empty:
+            return True
+    except json.JSONDecodeError:
+        return False
 
 
 if __name__ == "__main__":
