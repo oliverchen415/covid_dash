@@ -141,9 +141,9 @@ app.layout = dh.Div(
 
 
 @app.callback(
-    Output("graph", "figure"),
-    Input("country", "value"),
-    Input("status", "value")
+    [Output("graph", "figure")],
+    [Input("country", "value"),
+    Input("status", "value")]
 )
 def update_graph(country, status):
     endpoint = f"https://api.covid19api.com/country/{country}/status/{status}"
